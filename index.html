@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BrainGPT</title>
+<link rel="shortcut icon" href="https://icon-icons.com/icon/lightning/126642">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(-45deg, #0f172a, #111827, #1e293b, #0b1220);
+  background-size: 400% 400%;
+  animation: bg 12s ease infinite;
+  color: white;
+}
+
+/* smoother background */
+@keyframes bg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* HEADER */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+header h1 {
+  font-size: 26px;
+  background: linear-gradient(90deg, #ff4d4d, #4d79ff, #22c55e);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow 3s infinite alternate;
+  font-weight: 1000px;
+}
+
+@keyframes glow {
+  from { filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+  to { filter: drop-shadow(0 0 12px rgba(34,197,94,0.5)); }
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tab {
+  padding: 7px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.08);
+  transition: 0.3s;
+  font-size: 13px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.tab:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+/* SCREENS */
+.screen {
+  display: none;
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* CHAT BOX */
+#chat {
+    flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 80px; /* important */
+  scroll-behavior: smooth;
+}
+
+/* SCROLLBAR */
+#chat::-webkit-scrollbar {
+  width: 6px;
+}
+#chat::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+}
+
+/* MESSAGES */
+.msg {
+  padding: 12px 14px;
+  border-radius: 16px;
+  max-width: 75%;
+  white-space: pre-wrap;
+  animation: pop 0.2s ease-in-out;
+}
+
+@keyframes pop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 0 10px rgba(37,99,235,0.3);
+}
+
+.ai {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* INPUT AREA */
+.input-area {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  z-index: 1000;
+}
+
+/* INPUT */
+input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  outline: none;
+  background: rgba(255,255,255,0.07);
+  color: white;
+  transition: 0.3s;
+}
+
+input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 10px rgba(34,197,94,0.3);
+}
+
+/* BUTTON */
+button {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(34,197,94,0.4);
+}
+
+/* CARDS */
+.card {
+  background: rgba(255,255,255,0.08);
+  padding: 18px;
+  border-radius: 16px;
+  line-height: 1.6;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 10px;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(10px);
+  font-size: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+/* MOBILE RESPONSIVE FIXES */
+@media (max-width: 768px) {
+
+  header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .tab {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .msg {
+    max-width: 90%;
+    font-size: 14px;
+  }
+
+  input {
+    font-size: 14px;
+  }
+
+  button {
+    padding: 10px 14px;
+  }
+
+  #chat {
+    padding-bottom: 100px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>BrainGPT</h1>
+  <div class="tabs">
+    <div class="tab" onclick="showTab('home')">Home</div>
+    <div class="tab" onclick="showTab('about')">About</div>
+    <div class="tab" onclick="showTab('complaint')">Complaint</div>
+  </div>
+</header>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div id="chat"></div>
+
+  <!-- INPUT ONLY HERE -->
+  <div class="input-area" id="inputBox">
+    <input id="input" placeholder="Ask something..." />
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="about" class="screen">
+  <div class="card">
+    <h2>About BrainGPT</h2>
+    <p>Modern AI chatbot with real API, smooth UI, and mobile support.</p>
+    <br>
+    <b>Created by:</b> <i><u>Muhammad Safwan Karim in Karachi, Pakistan</u></i>
+  </div>
+</div>
+
+<!-- COMPLAINT -->
+<div id="complaint" class="screen">
+  <div class="card">
+    <h2>Complaint</h2>
+    <p>Report any issues or provide feedback about BrainGPT!</p>
+    <p>Report at: <b>msafwankarim13@gmail.com</b></p>
+  </div>
+</div>
+
+<script>
+const API_KEY = "vFTdhSIvZw861UMO7pkuTyIaj62idMWM0xfOXtlx";
+const chat = document.getElementById("chat");
+const inputBox = document.getElementById("inputBox");
+
+// ENTER KEY SUPPORT
+document.getElementById("input").addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    event.preventDefault(); // stops page refresh / form behavior
+    send();
+  }
+});
+
+/* TAB SWITCH */
+function showTab(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+
+  // hide input outside home
+  if (tab === "home") {
+    inputBox.style.display = "flex";
+  } else {
+    inputBox.style.display = "none";
+  }
+}
+
+/* FORMAT **bold** */
+function formatText(text) {
+  return text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+}
+
+/* MESSAGE */
+function addMsg(text, type) {
+  const div = document.createElement("div");
+  div.className = "msg " + type;
+  div.innerHTML = formatText(text);
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+/* SEND */
+async function send() {
+  const input = document.getElementById("input");
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMsg(text, "user");
+  input.value = "";
+
+  addMsg("Generating...", "ai");
+
+  try {
+    const res = await fetch("https://api.cohere.com/v1/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + API_KEY
+      },
+      body: JSON.stringify({
+        model: "command-a-03-2025",
+        message: text
+      })
+    });
+
+    const data = await res.json();
+    chat.lastChild.remove();
+
+    const reply =
+      data.text ||
+      data.reply ||
+      data.message ||
+      "No response";
+
+    addMsg(reply, "ai");
+
+  } catch (err) {
+    chat.lastChild.remove();
+    addMsg("Error: " + err.message, "ai");
+  }
+}
+</script>
+
+</body>
+<div class="footer">
+    <p>&copy; 2026 <b>BrainGPT</b> All rights reserved.</p>
+</div>
+</html>
